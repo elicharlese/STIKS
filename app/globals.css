@@ -1,0 +1,180 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 220 80% 22%; /* Royal blue */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 45 65% 52%; /* Gold */
+    --secondary-foreground: 0 0% 0%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 45 65% 52%; /* Gold */
+    --accent-foreground: 0 0% 0%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 220 80% 22%; /* Royal blue */
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 220 80% 22%; /* Royal blue */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 45 65% 52%; /* Gold */
+    --secondary-foreground: 0 0% 0%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 45 65% 52%; /* Gold */
+    --accent-foreground: 0 0% 0%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 45 65% 52%; /* Gold */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-size: 16px;
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans leading-relaxed;
+    letter-spacing: 0.01em;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-serif tracking-tight mb-4 font-medium;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl leading-tight;
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl leading-tight;
+    letter-spacing: -0.01em;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl leading-snug;
+  }
+
+  h4 {
+    @apply text-xl md:text-2xl;
+  }
+
+  p {
+    @apply mb-6 max-w-prose;
+    line-height: 1.7;
+  }
+
+  ul,
+  ol {
+    @apply mb-6 pl-6;
+  }
+
+  li {
+    @apply mb-2;
+  }
+
+  section {
+    @apply py-16 md:py-24;
+  }
+}
+
+/* Custom utility classes */
+.text-balance {
+  text-wrap: balance;
+}
+
+.prose-lg {
+  @apply text-lg leading-relaxed;
+}
+
+.prose-xl {
+  @apply text-xl leading-relaxed;
+}
+
+.container {
+  @apply px-4 md:px-6 max-w-7xl mx-auto;
+}
+
+.bg-royal-gradient {
+  background: linear-gradient(135deg, #0a2463 0%, #1d3b8c 100%);
+}
+
+.bg-gold-gradient {
+  background: linear-gradient(135deg, #d4af37 0%, #f4ce70 100%);
+}
+
+.text-gold {
+  color: #d4af37;
+}
+
+.text-royal {
+  color: #0a2463;
+}
+
+.border-gold {
+  border-color: #d4af37;
+}
+
+.border-royal {
+  border-color: #0a2463;
+}
+
+/* Card enhancements */
+.card-enhanced {
+  @apply transition-all duration-300 hover:shadow-lg;
+}
+
+/* Button enhancements */
+.btn-enhanced {
+  @apply transition-all duration-300 transform hover:translate-y-[-2px];
+}
+
