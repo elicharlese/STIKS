@@ -1,0 +1,510 @@
+openapi: 3.0.3
+info:
+  title: STIKS API
+  description: API for STIKS decentralized cryptocurrency CDO platform
+  version: 1.0.0
+  contact:
+    name: STIKS Support
+    email: support@stiks.io
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://stiks.vercel.app/api
+    description: Production server
+  - url: http://localhost:3000/api
+    description: Development server
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+            limit:
+              type: integer
+            total:
+              type: integer
+            has_more:
+              type: boolean
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [cdo_senior, cdo_mezzanine, cdo_junior, stik_pak]
+        risk_level:
+          type: string
+          enum: [low, medium, high]
+        min_investment:
+          type: number
+        max_investment:
+          type: number
+        current_apy:
+          type: number
+        expected_apy:
+          type: number
+        duration_days:
+          type: integer
+        total_capacity:
+          type: number
+        current_capacity:
+          type: number
+        underlying_assets:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [draft, active, paused, closed]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Investment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        portfolio_id:
+          type: string
+          format: uuid
+        product_id:
+          type: string
+          format: uuid
+        amount:
+          type: number
+        purchase_price:
+          type: number
+        current_value:
+          type: number
+        status:
+          type: string
+          enum: [pending, active, matured, cancelled]
+        purchase_date:
+          type: string
+          format: date-time
+        maturity_date:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    Portfolio:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        total_value:
+          type: number
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      description: Check the health status of the API and its dependencies
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          status:
+                            type: string
+                          services:
+                            type: object
+                          environment:
+                            type: string
+                          version:
+                            type: string
+
+  /products:
+    get:
+      summary: Get products
+      description: Retrieve a list of available investment products
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [cdo_senior, cdo_mezzanine, cdo_junior, stik_pak]
+        - name: risk_level
+          in: query
+          schema:
+            type: string
+            enum: [low, medium, high]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, active, paused, closed]
+            default: active
+      responses:
+        '200':
+          description: List of products
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Product'
+
+  /products/{id}:
+    get:
+      summary: Get product by ID
+      description: Retrieve detailed information about a specific product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Product details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Product'
+        '404':
+          description: Product not found
+
+  /investments:
+    get:
+      summary: Get user investments
+      description: Retrieve user's investment portfolio
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, active, matured, cancelled]
+        - name: portfolio_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of investments
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Investment'
+        '401':
+          description: Unauthorized
+
+    post:
+      summary: Create investment
+      description: Create a new investment in a product
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - product_id
+                - amount
+              properties:
+                product_id:
+                  type: string
+                  format: uuid
+                amount:
+                  type: number
+                  minimum: 0
+                portfolio_id:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Investment created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Investment'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+
+  /portfolios:
+    get:
+      summary: Get user portfolios
+      description: Retrieve user's portfolios with summary information
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of portfolios
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Portfolio'
+
+    post:
+      summary: Create portfolio
+      description: Create a new investment portfolio
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                description:
+                  type: string
+      responses:
+        '200':
+          description: Portfolio created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Portfolio'
+
+  /analytics:
+    get:
+      summary: Get analytics
+      description: Retrieve user's investment analytics and performance data
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: portfolio_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: start_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: granularity
+          in: query
+          schema:
+            type: string
+            enum: [daily, weekly, monthly]
+            default: daily
+      responses:
+        '200':
+          description: Analytics data
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+
+  /market:
+    get:
+      summary: Get market data
+      description: Retrieve current cryptocurrency market data
+      parameters:
+        - name: symbols
+          in: query
+          description: Comma-separated list of cryptocurrency symbols
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: Market data
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+
+  /auth/connect:
+    post:
+      summary: Connect wallet
+      description: Connect a cryptocurrency wallet and create/update user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - wallet_address
+              properties:
+                wallet_address:
+                  type: string
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                bio:
+                  type: string
+                risk_tolerance:
+                  type: string
+                  enum: [conservative, moderate, aggressive]
+      responses:
+        '200':
+          description: Wallet connected successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object

@@ -1,0 +1,57 @@
+# Docker Compose for local development
+version: '3.8'
+
+services:
+  # Main Next.js application
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - .env.local
+    depends_on:
+      - postgres
+      - rust-service
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+  # PostgreSQL database
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: stiks
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Rust Solana service
+  rust-service:
+    build: ./backend/rust-service
+    ports:
+      - "8080:8080"
+    environment:
+      - RUST_LOG=info
+      - PORT=8080
+      - HOST=0.0.0.0
+    env_file:
+      - ./backend/rust-service/.env
+    depends_on:
+      - postgres
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:

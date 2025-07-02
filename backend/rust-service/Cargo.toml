@@ -1,0 +1,53 @@
+[package]
+name = "stiks-solana-service"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Web framework
+tokio = { version = "1.0", features = ["full"] }
+axum = "0.7"
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Solana SDK
+solana-sdk = "1.17"
+solana-client = "1.17"
+solana-program = "1.17"
+anchor-client = "0.29"
+anchor-lang = "0.29"
+
+# Cryptography
+ed25519-dalek = "2.0"
+bs58 = "0.5"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Async
+futures = "0.3"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Environment
+dotenv = "0.15"
+
+# HTTP client
+reqwest = { version = "0.11", features = ["json"] }
+
+# UUID
+uuid = { version = "1.0", features = ["v4", "serde"] }
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
+
+# Decimal arithmetic
+rust_decimal = { version = "1.33", features = ["serde"] }
+
+[dev-dependencies]
+tokio-test = "0.4"
